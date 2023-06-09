@@ -1,0 +1,66 @@
+@**
+  
+  Project SmartWASM
+  Copyright (C) 2023 Alessio Saltarin
+  MIT License 
+  
+ **@
+
+@using System.Threading;
+@using System.Globalization
+
+@inject ILogger<ShowTime> Logger
+
+<div class="card" style="width: 18rem;">
+    <h5 class="card-header">Current Time</h5>
+    <div class="card-body">
+        <h5>@CurrentTime()</h5>
+        <div class="form-check form-switch">
+            <input class="form-check-input" 
+                   type="checkbox" 
+                   id="ampmswitch"
+                   role="switch" @attributes="@_timerAttributes" @onclick="ChangeAmPm">
+            <label class="form-check-label" for="ampmswitch">AM/PM</label>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public bool? AmPm { get; set; }
+
+    private Timer? _timer;
+    private Dictionary<string, object>? _timerAttributes;
+
+    protected override void OnInitialized()
+    {
+        this._timerAttributes = new Dictionary<string, object>
+        {
+            ["checked"] = this.AmPm ?? false,
+        };
+        
+        this._timer = new Timer((object? stateInfo) =>
+        {
+            StateHasChanged();
+        }, new AutoResetEvent(false), 1000, 1000); // fire every 2000 milliseconds
+    }
+
+    private void ChangeAmPm()
+    {
+        if (this._timerAttributes == null) return;
+        this.AmPm = !this.AmPm;
+        this._timerAttributes["checked"] = !(bool)this._timerAttributes["checked"];
+    }
+
+    private string CurrentTime()
+    {
+        var curTime = "";
+        if (this.AmPm == null)
+            return curTime;
+        curTime = this.AmPm.Value ? DateTime.Now.ToLongTimeString() : DateTime.Now.ToString("HH:mm:ss");
+        return curTime;
+    }
+    
+}

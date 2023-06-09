@@ -1,0 +1,65 @@
+﻿@**
+  
+  Project SmartWASM
+  Copyright (C) 2023 Alessio Saltarin
+  MIT License 
+  
+ **@
+
+@page "/fetchdata"
+@layout NavLayout
+
+@using SmartWasm.Services
+@using SmartWasm.Dto
+
+<PageTitle>SmartWASM | Weather</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (_isLoading)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else
+{
+    @if (_weather != null)
+    {
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">City</th>
+                <th scope="col">Temperature</th>
+                <th scope="col">Weather</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>@_weather.Data[0].Datetime</td>
+                <td>@_weather.Data[0].CityName</td>
+                <td>@_weather.Data[0].Temp °C</td>
+                <td>@_weather.Data[0].Weather.Description</td>
+            </tr>
+            </tbody>
+        </table>
+    }
+    
+}
+
+@code {
+    
+    private bool _isLoading;
+    private WeatherDto? _weather;
+
+    protected override async Task OnInitializedAsync()
+    {
+        this._isLoading = true;
+        this._weather = await WeatherApi.GetWeather(9.188540, 45.464664);
+        this._isLoading = false;
+    }
+    
+}
